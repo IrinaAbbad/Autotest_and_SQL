@@ -1,30 +1,31 @@
 1. 
-SELECT couriers.login, COUNT (orders."inDelivery") FROM  "Couriers" AS couriers INNER JOIN  "Orders" AS orders ON orders."courierId"=couriers.id WHERE (orders."inDelivery") ='t' GROUP BY couriers.login;
+SELECT couriers.login, COUNT (orders.track) FROM  "Couriers" AS couriers INNER JOIN  "Orders" AS orders ON orders."courierId"=couriers.id WHERE (orders."inDelivery") ='t' GROUP BY couriers.login;
  login | count
 -------+-------
  major |     8
  minor |     2
 (2 rows)
 
- courierId | inDelivery
------------+------------
-           | f
-           | f
-           | f
-           | f
-         1 | t
-         1 | t
-         1 | t
-         1 | t
-         2 | t
-         2 | t
-         1 | t
-         1 | t
-         1 | t
-         1 | t
-           | f
-           | f
-(16 rows)
+
+Проверка:
+ SELECT "courierId", track FROM "Orders";
+ courierId | track
+-----------+--------
+         1 |  14006
+         1 |  14006
+         1 | 399197
+         1 | 399197
+         1 | 203384
+         1 | 203384
+         1 | 659848
+         1 | 659848
+         2 |  56895
+         2 |  56895
+         2 | 865503
+         2 | 865503
+(12 rows)
+
+Примечание: заказы задваиваются, т.к. в приложении баг - при принятии заказа курьером, на вкладке "Мои" принятые заказы дублируются.
 
 2.
 SELECT track, (CASE WHEN finished = 't' THEN '2' WHEN cancelled = 't' THEN '-1' WHEN "inDelivery" = 't' THEN '1' ELSE '0' END) AS status FROM "Orders";
@@ -50,8 +51,3 @@ SELECT track, (CASE WHEN finished = 't' THEN '2' WHEN cancelled = 't' THEN '-1' 
 
 Примечание: заказы задваиваются, т.к. в приложении баг - при принятии заказа курьером, на вкладке "Мои" принятые заказы дублируются.
 
-WHERE orders."inDelivery"=true
-FROM "Couriers";
-
-ssh b273be0c-f596-4511-967d-a6bcdfc4befc@serverhub.praktikum-services.ru -p 4554
-psql -U morty -d scooter_rent
